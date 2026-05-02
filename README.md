@@ -457,3 +457,37 @@ Let me think through all the Phase 2 activities carefully before writing a singl
 ---
 
 Shall we now build the Phase 3 (DevOps & Infrastructure) instruction file covering Dockerfile, Helm, AKS, Istio, and Harness?
+
+
+
+
+
+Let me think through all Phase 3 activities carefully before writing a single prompt.Good. Now let me draw the Phase 3 activity map first, then build the full instruction file.Seven layers, 14 prompts. Now building the full instruction file.Here's the full breakdown of what's in the file.
+
+---
+
+### 14 Prompts Across 6 Activities + Review Gate
+
+| Activity | Prompts | What it produces |
+|---|---|---|
+| **3.1** Dockerfile | 3.1-A, 3.1-B | Multi-stage distroless build + `.dockerignore` |
+| **3.2** ACR | 3.2-A | Registry setup, tagging strategy, Trivy scan policy, `.trivyignore` template |
+| **3.3** Helm | 3.3-A, 3.3-B, 3.3-C | Library chart (shared) + per-service chart + 3 environment `values-*.yaml` |
+| **3.4** AKS | 3.4-A, 3.4-B, 3.4-C | Namespaces + RBAC, Key Vault + Workload Identity, NetworkPolicies |
+| **3.5** Istio | 3.5-A, 3.5-B, 3.5-C | VirtualService + DestinationRule, mTLS + AuthorizationPolicy, Gateway + ingress routing |
+| **3.6** Harness | 3.6-A, 3.6-B | Shared pipeline template + thin per-service override |
+| **3.R** Review gate | 3.R | 20-item checklist across security, reliability, deployment, and observability |
+
+---
+
+### Four Decisions Baked Into the Prompts Worth Noting
+
+**Strangler Fig is wired in from day one.** Every `VirtualService` (3.5-A) comes with the commented-out 90/10 traffic split block pre-written and ready — you just uncomment during Phase 4 cutover. No scrambling to add it later.
+
+**SAP retry policy is explicitly non-retrying on 5xx.** This is intentional and important — SAP SOAP operations like payment posting are often non-idempotent. Auto-retrying a failed payment would be a serious financial risk.
+
+**The `.NET` legacy service is a first-class citizen in the Istio config.** The `dotnet-v1` subset in the `DestinationRule` and the `PERMISSIVE` mTLS override for legacy pods (3.5-B) are there from the start, so the Strangler Fig transition in Phase 4 is purely a weight change — no infrastructure rework needed mid-cutover.
+
+**The execution order splits into a "once" block and a "per service" block.** The global infrastructure (Helm library, namespaces, Key Vault, Gateway) is built once. Individual service infra reuses it as thin overrides — exactly as intended.
+
+Shall we build Phase 4 next — the integration testing and Strangler Fig cutover instruction file?
