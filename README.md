@@ -491,3 +491,50 @@ Let me think through all Phase 3 activities carefully before writing a single pr
 **The execution order splits into a "once" block and a "per service" block.** The global infrastructure (Helm library, namespaces, Key Vault, Gateway) is built once. Individual service infra reuses it as thin overrides — exactly as intended.
 
 Shall we build Phase 4 next — the integration testing and Strangler Fig cutover instruction file?
+
+
+
+
+
+Let me plan Phase 4 carefully before writing a single prompt — this phase is the most operationally sensitive of all four.Good. Two diagrams for Phase 4 — the activity flow, then the Strangler Fig traffic progression. Then the full instruction file.Now the Strangler Fig traffic progression — this is the centrepiece of Phase 4 and worth its own diagram.That's the full picture. Now building the instruction file.Here's the full breakdown of what's in the file.
+
+---
+
+### 15 Prompts Across 7 Activities
+
+| Activity | Prompts | What it produces |
+|---|---|---|
+| **4.1** SAP integration testing | 4.1-A, 4.1-B, 4.1-C | Integration test class · parity comparison script · SAP edge case tests |
+| **4.2** Readiness gate | 4.2-A | 5-section go/no-go checklist with sign-off table |
+| **4.3** Strangler Fig | 4.3-A, 4.3-B | Per-stage runbook · exact `kubectl patch` commands for all 4 traffic stages |
+| **4.4** Production validation | 4.4-A, 4.4-B | PrometheusRule alert manifests · Grafana dashboard JSON |
+| **4.5** Rollback | 4.5-A, 4.5-B | Rollback runbook · decision tree (ASCII, readable under pressure) |
+| **4.6** Decommission | 4.6-A, 4.6-B | Decommission checklist · Istio cleanup patches + `.NET` removal commands |
+| **4.7** Closure | 4.7-A | ADRs · operations runbook · lessons learned · framework reuse guide |
+
+---
+
+### Four Decisions Baked Into Phase 4 Worth Noting
+
+**4.1-C covers the seven SAP SOAP quirks** that most commonly cause silent parity failures in `.NET` to Java migrations — whitespace padding, empty vs null fields, decimal scale, date format differences, WS-Security timestamp tolerance, large payload handling, and stateful SAP headers. These are the things the WSDL won't tell you.
+
+**The rollback runbook (4.5-A) is written before the cutover starts**, not reactively. The critical design decision is that 4.5 is generated and reviewed in the pre-cutover window — the on-call engineer reads the decision tree before the window opens, not during an incident.
+
+**Traffic shift commands (4.3-B) are presented as human-run commands with confirmation gates** — not automation. The global rules section explicitly prohibits any AI tool from autonomously shifting Istio weights, which is the right boundary for production financial services.
+
+**4.7-A produces the framework reuse guide** — the final artefact that closes the loop back to your original goal. The lessons learned and reuse guide are what make this a framework for future migrations, not just a one-time exercise.
+
+---
+
+### The Complete Four-File Set
+
+You now have the full framework across all four phases:
+
+| File | Scope | Prompts |
+|---|---|---|
+| `phase1-copilot-instructions.md` | Discovery & analysis | 9 |
+| `phase2-copilot-instructions.md` | App migration | 14 |
+| `phase3-copilot-instructions.md` | DevOps & infrastructure | 14 |
+| `phase4-copilot-instructions.md` | Integration & cutover | 15 |
+
+All four files go into `.github/` in your migration repo and Copilot picks them up automatically via `@workspace`.
