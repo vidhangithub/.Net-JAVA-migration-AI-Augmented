@@ -425,3 +425,35 @@ The single most important principle across all three phases is this — **the fr
 - Strangler Fig traffic shifting via Istio
 - Incremental cutover service by service
 - Legacy .NET decommission
+
+
+Let me think through all the Phase 2 activities carefully before writing a single prompt.Now let me build the full Phase 2 instruction file.Seven clearly sequenced activities. Now let me build the full instruction file.Here's what's in the file and how it's structured.
+
+---
+
+### 14 Prompts Across 7 Activities
+
+| Activity | Prompts | What it does |
+|---|---|---|
+| **2.1** WSDL → Java stubs | 2.1-A, 2.1-B | Generates `pom.xml` plugin config, validates JAXB output vs `Reference.cs` |
+| **2.2** DTO translation | 2.2-A, 2.2-B | Translates `[DataContract]` classes to Java 21 records, single or bulk |
+| **2.3** Business logic | 2.3-A, 2.3-B, 2.3-C | Analysis first, then `@Service`, then `@RestController` — deliberately sequential |
+| **2.4** SAP client layer | 2.4-A, 2.4-B | `@Component` client class + `@Configuration` bean wiring with `Wss4j` |
+| **2.5** Exception mapping | 2.5-A | Full exception hierarchy + static factory class replacing `FaultException<T>` |
+| **2.6** Tests | 2.6-A, 2.6-B | JUnit 5 unit tests + Spring Cloud Contract stubs |
+| **2.7** Common-lib | 2.7-A, 2.7-B | Candidate identification + `CorrelationIdFilter` (Istio-aware) |
+| **2.R** Review gate | 2.R | Pre-merge checklist covering correctness, safety, quality, and tests |
+
+---
+
+### Three Design Decisions Worth Noting
+
+**2.3-A runs before any code is generated.** The pre-translation analysis prompt forces the AI to document every business rule, SAP field mapping, and hidden complexity before touching Java. This is your insurance policy — if the generated `@Service` misses something, 2.3-A is the reference to catch it.
+
+**The review prompt (2.R) is a hard gate.** The execution order at the bottom explicitly states no service merges without passing 2.R, and no Phase 3 starts until at least two Green-tier services are clean. This keeps AI-generated code from silently drifting into production.
+
+**2.4-B generates its own `application.yml` snippet.** Every config class outputs the property keys it needs as a block comment — so nothing gets missed when wiring up the service for the first time.
+
+---
+
+Shall we now build the Phase 3 (DevOps & Infrastructure) instruction file covering Dockerfile, Helm, AKS, Istio, and Harness?
