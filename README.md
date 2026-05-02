@@ -382,4 +382,46 @@ Risk scoring      Contract tests        Decommission
 
 The single most important principle across all three phases is this — **the framework you build in Phase 2 is the real deliverable, not just the two pilot services**. Every hour invested in the Helm library chart, the common-lib, and the Copilot instruction file pays back multiplied across every service in Phase 3.
 
-Would you like to go deeper on any specific phase — for example, the Strangler Fig Istio config, the contract test setup, or how to structure the Harness pipeline template?
+
+
+
+
+---
+
+## Revised Phase Structure
+
+| Phase | Focus | Who Leads |
+|---|---|---|
+| **Phase 1** | Discovery & Analysis | Architect + Senior Engineer |
+| **Phase 2** | Application Migration (Spring Boot code only) | Engineering Team |
+| **Phase 3** | DevOps & Infrastructure (Helm, AKS, Harness, Istio) | DevOps / Platform Team |
+| **Phase 4** | Integration Testing & Cutover (SAP validation, Strangler Fig, decommission) | Engineering + DevOps together |
+
+---
+
+### Why This Separation Makes Sense
+
+**Phase 2 stays purely app-focused:**
+- WSDL → Java stub generation
+- Business logic translation (.svc.cs → Spring Boot services)
+- SAP client layer (WebServiceTemplate, Wss4j)
+- REST endpoint exposure
+- Unit tests and contract tests
+- Common-lib module
+- No Docker, no Helm, no AKS concerns at all
+
+**Phase 3 is purely infrastructure:**
+- Dockerfile per service
+- Helm library chart + per-service values
+- AKS configuration (namespaces, secrets, resource quotas)
+- Istio VirtualService / DestinationRule templates
+- Harness pipeline YAML
+- Azure Key Vault integration for SAP credentials
+- Container registry setup
+
+**Phase 4 brings them together for the first time:**
+- Deploy to SAP sandbox environment
+- Contract tests run against real SAP
+- Strangler Fig traffic shifting via Istio
+- Incremental cutover service by service
+- Legacy .NET decommission
